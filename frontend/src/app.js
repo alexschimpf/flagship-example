@@ -1,4 +1,4 @@
-import Flagship from 'flagship';
+import Flagship from 'flagship-sdk';
 import React from 'react';
 import { getSignature } from './api';
 import './app.css';

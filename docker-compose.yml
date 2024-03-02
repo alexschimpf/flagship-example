@@ -11,7 +11,6 @@ services:
             - mysql-volume:/var/lib/mysql
         environment:
             - MYSQL_ROOT_PASSWORD=test
-            - DEV=1
         healthcheck:
             test: ["CMD", "mysqladmin", "-uroot", "-ptest", "ping"]
             interval: 5s
@@ -80,28 +79,43 @@ services:
         build:
             context: ./frontend
         depends_on:
-            - flagship-admin-server
-            - flagship-flags-server
-            - flagship-ui-server
-            - redis
-            - mysql
-            - backend
+            flagship-admin-server:
+                condition: service_started
+            flagship-flags-server:
+                condition: service_started
+            flagship-ui-server:
+                condition: service_started
+            redis:
+                condition: service_healthy
+            mysql:
+                condition: service_healthy
+            backend:
+                condition: service_started
         container_name: frontend
         restart: always
-        ports: 3001:3001
+        ports:
+            - 3001:3001
 
     backend:
         build:
-            context: ./frontend
+            context: ./backend
+        volumes:
+            - ./backend:/backend
         depends_on:
-            - flagship-admin-server
-            - flagship-flags-server
-            - flagship-ui-server
-            - redis
-            - mysql
+            flagship-admin-server:
+                condition: service_started
+            flagship-flags-server:
+                condition: service_started
+            flagship-ui-server:
+                condition: service_started
+            redis:
+                condition: service_healthy
+            mysql:
+                condition: service_healthy
         container_name: backend
         restart: always
-        ports: 8002:80
+        ports:
+            - 8002:80
 
 volumes:
     mysql-volume:

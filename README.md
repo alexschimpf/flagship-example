@@ -2,14 +2,22 @@
 
 This is a simple example project using the Flagship platform.
 
+You can find documentation about Flagship at: https://alexschimpf.github.io/flagship
+
 ## Running
 
-Simply run the following command:
+1. Start docker-compose
 ```shell
 make run
 ```
 
 This will run everything necessary via docker-compose.
+Note: This may take a few minutes. The `flagship-ui-server` container takes extra time because it has to build its bundle at runtime.
+
+2. Initialize Redis with some data
+```shell
+make init-redis
+```
 
 You can see the example project UI at: http://localhost:3001
 
@@ -44,4 +52,3 @@ The example project works like so:
 
 
 You may be thinking... couldn't this whole thing be done without Flagship? And you are absolutely right. This point of this project is just to show the whole end-to-end system in action.
-

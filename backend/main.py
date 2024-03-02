@@ -1,13 +1,13 @@
 from fastapi import FastAPI, APIRouter
 from pydantic import BaseModel
-from flagship import Flagship
+from flagship_sdk import Flagship
 from fastapi.middleware.cors import CORSMiddleware
 
 
 FLAGSHIP_HOST = 'localhost'
 FLAGSHIP_PORT = 8001
 PROJECT_ID = 1
-PRIVATE_KEY = '754a019a9f7c4a832ceaf2c83f50d40dffc1e018ac6635129f1ed5c1b5f18901'
+PRIVATE_KEY = '1bb02fb62c08f238442e4a2a9faf9173280775ad322c98d30eeb3fe92bc7f146'
 
 
 class Signature(BaseModel):
