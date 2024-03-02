@@ -15,3 +15,9 @@ help:
 		} \
 	} \
 	{ lastLine = $$0 }' $(MAKEFILE_LIST)
+
+# run docker-compose
+run:
+	docker-compose down -v --remove-orphans &&\
+	docker-compose pull &&\
+	docker-compose up --build

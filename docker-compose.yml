@@ -1,0 +1,108 @@
+services:
+    mysql:
+        image: "mysql:8.2.0"
+        container_name: mysql
+        restart: on-failure
+        ports:
+            - 3306:3306
+        volumes:
+            - ./mysql/sql:/opt/sql
+            - ./mysql/init.sh:/docker-entrypoint-initdb.d/init.sh
+            - mysql-volume:/var/lib/mysql
+        environment:
+            - MYSQL_ROOT_PASSWORD=test
+            - DEV=1
+        healthcheck:
+            test: ["CMD", "mysqladmin", "-uroot", "-ptest", "ping"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
+            start_period: 5s
+
+    redis:
+        image: "grokzen/redis-cluster:7.0.10"
+        container_name: redis
+        restart: on-failure
+        ports:
+            - 7000-7005:7000-7005
+        volumes:
+            - redis-volume:/redis-data
+        environment:
+            - IP=redis
+        healthcheck:
+            test: ["CMD", "redis-cli", "-p", "7000", "ping"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
+            start_period: 5s
+
+    flagship-admin-server:
+        image: alexschimpf/flagship-admin:latest
+        container_name: flagship-admin-server
+        depends_on:
+            redis:
+                condition: service_healthy
+            mysql:
+                condition: service_healthy
+        restart: always
+        ports:
+            - 8000:80
+        environment:
+            - SECRET_KEY=_NOR3QX7-7LAJLLQ_OeOMuFzfq1Xg9RICwTalktXg5s=
+            - MYSQL_CONN_STR=mysql+mysqlconnector://root:test@mysql:3306/flagship
+            - REDIS_CONN_STR=redis://redis:7000
+
+    flagship-flags-server:
+        image: alexschimpf/flagship-flags:latest
+        container_name: flagship-flags-server
+        depends_on:
+            redis:
+                condition: service_healthy
+            mysql:
+                condition: service_healthy
+        restart: always
+        ports:
+            - 8001:80
+        environment:
+            - SECRET_KEY=_NOR3QX7-7LAJLLQ_OeOMuFzfq1Xg9RICwTalktXg5s=
+            - REDIS_CONN_STR=redis://redis:7000
+
+    flagship-ui-server:
+        image: alexschimpf/flagship-frontend:latest
+        depends_on:
+            - flagship-admin-server
+        container_name: flagship-ui-server
+        restart: always
+        ports:
+            - 3000:3000
+
+    frontend:
+        build:
+            context: ./frontend
+        depends_on:
+            - flagship-admin-server
+            - flagship-flags-server
+            - flagship-ui-server
+            - redis
+            - mysql
+            - backend
+        container_name: frontend
+        restart: always
+        ports: 3001:3001
+
+    backend:
+        build:
+            context: ./frontend
+        depends_on:
+            - flagship-admin-server
+            - flagship-flags-server
+            - flagship-ui-server
+            - redis
+            - mysql
+        container_name: backend
+        restart: always
+        ports: 8002:80
+
+volumes:
+    mysql-volume:
+    redis-volume:
