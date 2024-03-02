@@ -26,6 +26,7 @@ Firstly, we have a docker-compose file that runs everything.
 - Flagship UI Server
   - Found at: http://localhost:3000
   - You can see how everything is set up on the Flagship side here
+  - Log in with email `owner@flag.ship` and password `Test123!`
 - Example Project UI
   - Simple React app using Javascript SDK
   - Found at: http://localhost:3001
